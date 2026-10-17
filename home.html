@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <title>Caricamento foto casuale...</title>
+    <script>
+        // SOSTITUISCI QUESTE TRE INFORMAZIONI CON I TUOI DATI DI GITHUB:
+        const username = "filippevery"; 
+        const repoName = "qr-foto-random"; 
+        const folderPath = ""; // Lascia vuoto se le foto sono nella cartella principale, altrimenti metti il nome della sottocartella (es. "foto")
+
+        async function caricaFotoCasuale() {
+            try {
+                // Interroga l'API di GitHub per ottenere la lista dei file nella repo
+                const apiUrl = `https://api.github.com/repos/${username}/${repoName}/contents/${folderPath}`;
+                const response = await fetch(apiUrl);
+                const files = await response.json();
+
+                // Filtra solo le immagini o le GIF basandosi sulle estensioni
+                const estensioniValide = ['.jpg', '.jpeg', '.png', '.gif', '.webp'];
+                const immagini = files.filter(file => {
+                    const nomeLower = file.name.toLowerCase();
+                    return estensioniValide.some(ext => nomeLower.endsWith(ext));
+                });
+
+                if (immagini.length === 0) {
+                    document.body.innerHTML = "<h3>Nessuna foto trovata nella cartella!</h3>";
+                    return;
+                }
+
+                // Sceglie un'immagine casuale dalla lista trovata in automatico
+                const randomIndex = Math.floor(Math.random() * immagini.length);
+                const fotoScelta = immagini[randomIndex];
+
+                // Reindirizza l'utente direttamente all'URL del file raw dell'immagine
+                window.location.href = fotoScelta.download_url;
+
+            } catch (error) {
+                console.error("Errore nel recupero delle foto:", error);
+                document.body.innerHTML = "<h3>Errore durante il caricamento. Riprova!</h3>";
+            }
+        }
+
+        // Avvia la funzione appena si apre la pagina
+        window.onload = caricaFotoCasuale;
+    </script>
+</head>
+<body>
+    <p style="text-align: center; margin-top: 20vh; font-family: sans-serif;">Sto estraendo una foto a caso...</p>
+</body>
+</html>
